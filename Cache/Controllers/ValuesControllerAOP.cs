@@ -7,38 +7,33 @@ using Microsoft.AspNetCore.Mvc;
 using Castle.DynamicProxy;
 
 using TestCache.AOP;
+using Cache.Services;
 
 namespace TestCache.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesAOPController : ControllerBase
     {
-        private ICache _cache;
+        private IValuesService _service;
 
-        public ValuesController(ICache cache)
+        public ValuesAOPController(IValuesService service)
         {
-            _cache = cache;
+            _service = service;
         }
 
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new List<string>(_service.GetValues());
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            if (_cache.KeyExists("value"))
-            {
-                return _cache.GetString("value");
-            }
-            var v = "the value";
-            _cache.AddString("value", v, TimeSpan.FromSeconds(20));
-            return v;
+            return _service.Get(id);
         }
     }
 }

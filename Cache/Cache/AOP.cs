@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using Castle.DynamicProxy;
 
+using Cache.Core.Interfaces;
+
 namespace TestCache.AOP
 {
     public interface ICacheable
@@ -38,7 +40,7 @@ namespace TestCache.AOP
         {
             var cacheAttribute = invocation.MethodInvocationTarget.GetCustomAttribute<CacheAttribute>();
 
-            var cachedValue = _cache.GetString(cacheAttribute.Key);
+            var cachedValue = _cache.Get(cacheAttribute.Key, invocation.TargetType);
 
             if (cachedValue != null)
             {
@@ -48,7 +50,7 @@ namespace TestCache.AOP
 
             invocation.Proceed();
             var value = invocation.ReturnValue;
-            _cache.AddString(cacheAttribute.Key, value as string, cacheAttribute.TTL);
+            _cache.Set(cacheAttribute.Key, value, cacheAttribute.TTL);
         }
     }
 

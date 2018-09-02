@@ -4,9 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-using Castle.DynamicProxy;
-
-using TestCache.AOP;
 using Cache.Services;
 
 namespace TestCache.Controllers

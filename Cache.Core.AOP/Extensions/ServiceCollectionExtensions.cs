@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using StackExchange.Redis;
+using System.Text;
 
 using Castle.DynamicProxy;
 
 using Cache.Core.Interfaces;
-using TestCache.AOP;
+using Cache.Core.AOP.Interceptors.Cache;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -21,8 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<TService, TImplementation>(provider => {
                 var generator = new ProxyGenerator();
-                var options = new ProxyGenerationOptions(new CacheProxyGeneratorHook());
-                var proxy = generator.CreateClassProxy<TImplementation>(options, new CacheInterceptor(provider.GetService<ICache>()));
+                var proxy = generator.CreateClassProxy<TImplementation>(new CacheInterceptor(provider.GetService<ICache>()));
                 return proxy;
             });
 

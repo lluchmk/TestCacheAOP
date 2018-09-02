@@ -5,20 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Cache\AOP.cs~RF60b9b59e.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cache.Core.AOP\Cache.Core.AOP.csproj" />
     <ProjectReference Include="..\Cache.Core\Cache.Core.csproj" />
   </ItemGroup>
 

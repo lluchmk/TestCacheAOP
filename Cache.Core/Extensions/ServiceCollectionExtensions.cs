@@ -26,6 +26,6 @@ namespace Microsoft.Extensions.DependencyInjection
             });*/
 
         public static IServiceCollection AddCache(this IServiceCollection services, string connectionString) =>
-            services.AddSingleton<ICache>(_p =>  new Cache.Core.Definitions.Cache(_p.GetService<IDatabase>()));
+            services.AddRedis(connectionString).AddSingleton<ICache>(_p =>  new Cache.Core.Definitions.Cache(_p.GetService<IDatabase>()));
     }
 }

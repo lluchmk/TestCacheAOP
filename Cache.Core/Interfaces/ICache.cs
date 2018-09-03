@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 namespace Cache.Core.Interfaces
 {
-    // TODO: Non-generic mehtodswith Type parameter
     public interface ICache
     {
         dynamic GetUnderlyingDatabase();
+
+        bool Exists(string key);
+
+        Task<bool> ExistsAsync(string key);
 
         T Get<T>(string key);
 

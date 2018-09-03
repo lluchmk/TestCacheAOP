@@ -21,6 +21,15 @@ namespace Cache.Core.Definitions
         {
             return _database;
         }
+        public bool Exists(string key)
+        {
+            return _database.KeyExists(key);
+        }
+
+        public async Task<bool> ExistsAsync(string key)
+        {
+            return await _database.KeyExistsAsync(key);
+        }
 
         public T Get<T>(string key)
         {

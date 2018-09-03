@@ -29,7 +29,16 @@ namespace Cache.Core.AOP.Interceptors.Cache
                 return;
             }
 
-            var cachedValue = _cache.Get(cacheAttribute.Key, invocation.TargetType);
+            var cacheKey = cacheAttribute.Key;
+            var @params = invocation.MethodInvocationTarget.GetParameters();
+            for (int i = 0; i < @params.Length; i++)
+            {
+                var paramName = @params[i].Name;
+                var val = invocation.Arguments[i];
+                cacheKey = cacheKey.Replace($"{{{paramName}}}", val.ToString());
+            }
+
+            var cachedValue = _cache.Get(cacheKey, invocation.TargetType);
 
             if (cachedValue != null)
             {

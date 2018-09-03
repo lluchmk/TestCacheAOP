@@ -9,7 +9,7 @@ using Cache.Core.AOP.Interceptors.Cache;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class CacheStartupExtensionsAOP
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddTransientCached<TService, TImplementation>(this IServiceCollection services)
             where TService : class

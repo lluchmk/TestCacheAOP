@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Cache.Services;
+using Cache.Core.AOP.Interceptors.Cache;
+
+using Core.AOP;
 
 namespace TestCache
 {
@@ -27,8 +30,9 @@ namespace TestCache
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCache("127.0.0.1:6379");
-            services.AddTransientCached<IValuesService, ValuesService>();
+            services.AddCache("devappfab1.riadev.local:6379,devappfab2.riadev.local:6379,abortConnect=false");
+            services.AddInterceptor<ICacheable, CacheInterceptor>();
+            services.AddTransientAOP<IValuesService, ValuesService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

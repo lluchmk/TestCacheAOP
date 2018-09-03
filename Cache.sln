@@ -5,9 +5,11 @@ VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCache", "Cache\TestCache.csproj", "{9D2E8848-9B74-4651-99F1-3E06A16CA12B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cache.Core", "Cache.Core\Cache.Core.csproj", "{DA88338C-B6F3-45B3-85F7-50CEB0D6B33C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cache.Core", "Cache.Core\Cache.Core.csproj", "{DA88338C-B6F3-45B3-85F7-50CEB0D6B33C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cache.Core.AOP", "Cache.Core.AOP\Cache.Core.AOP.csproj", "{46088DF8-4790-4C25-9667-BFBE0B0413B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cache.Core.AOP", "Cache.Core.AOP\Cache.Core.AOP.csproj", "{46088DF8-4790-4C25-9667-BFBE0B0413B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.AOP", "Core.AOP\Core.AOP.csproj", "{942ACA61-666D-4F16-A4AD-A629962FEBFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{46088DF8-4790-4C25-9667-BFBE0B0413B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46088DF8-4790-4C25-9667-BFBE0B0413B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46088DF8-4790-4C25-9667-BFBE0B0413B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{942ACA61-666D-4F16-A4AD-A629962FEBFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{942ACA61-666D-4F16-A4AD-A629962FEBFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{942ACA61-666D-4F16-A4AD-A629962FEBFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{942ACA61-666D-4F16-A4AD-A629962FEBFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

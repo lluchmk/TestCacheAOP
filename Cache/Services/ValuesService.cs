@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Cache.Core.AOP.Attributes;
+using Cache.Core.AOP.Interceptors.Cache;
 
 namespace Cache.Services
 {
@@ -14,7 +15,7 @@ namespace Cache.Services
         string Get(int id);
     }
 
-    public class ValuesService : IValuesService
+    public class ValuesService : IValuesService, ICacheable
     {
         private IEnumerable<string> _values = new string[] { "value1", "value2" };
 
@@ -23,10 +24,10 @@ namespace Cache.Services
             return _values;
         }
 
-        [Cache("value", "00:00:30")]
+        [Cache("value_id:{id}", "00:00:30")]
         public virtual string Get(int id)
         {
-            return "value";
+            return $"value{id}";
         }
     }
 }

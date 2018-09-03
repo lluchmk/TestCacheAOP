@@ -15,7 +15,8 @@ namespace Cache.Services
         string Get(int id);
     }
 
-    public class ValuesService : IValuesService, ICacheable
+    [Cacheable]
+    public class ValuesService : IValuesService
     {
         private IEnumerable<string> _values = new string[] { "value1", "value2" };
 

@@ -7,17 +7,17 @@ namespace Core.AOP
     // TODO: Separate into different files
     public class InterceptorAssociation
     {
-        public Type interfaceType;
+        public Type attributeType;
         public Type interceptorType;
     }
 
     public class InterceptorAssociationCollection : List<InterceptorAssociation>
     {
-        public void AddEntry<TInterface, TInterceptor>()
+        public void AddEntry<TAttribute, TInterceptor>()
         {
             Add(new InterceptorAssociation
             {
-                interfaceType = typeof(TInterface),
+                attributeType = typeof(TAttribute),
                 interceptorType = typeof(TInterceptor)
             });
         }

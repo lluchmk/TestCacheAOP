@@ -10,8 +10,8 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddInterceptor<TInterface, TInterceptor>(this IServiceCollection services)
-            where TInterface : class
+        public static IServiceCollection AddInterceptor<TAttribute, TInterceptor>(this IServiceCollection services)
+            where TAttribute : class
             where TInterceptor : class, IInterceptor
         {
             var interceptorsDictionary = services.BuildServiceProvider().GetService<InterceptorAssociationCollection>();
@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 interceptorsDictionary = new InterceptorAssociationCollection();
                 services.AddSingleton(interceptorsDictionary);
             }
-            interceptorsDictionary.AddEntry<TInterface, TInterceptor>();
+            interceptorsDictionary.AddEntry<TAttribute, TInterceptor>();
             return services;
         }
 
@@ -36,8 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 List<IInterceptor> interceptors = new List<IInterceptor>();
                 foreach (var entry in interceptorsDef)
                 {
-                    var interfaceName = entry.interfaceType.Name;
-                    if (typeof(TImplementation).GetInterface(interfaceName) != null)
+                    if (typeof(TImplementation).GetCustomAttributes(entry.attributeType, false).Length > 0)
                     {
                         var ctr = entry.interceptorType.GetConstructors()[0];
                         var ctrParams = new List<object>();

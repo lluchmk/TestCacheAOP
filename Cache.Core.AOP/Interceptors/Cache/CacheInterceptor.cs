@@ -48,7 +48,7 @@ namespace Cache.Core.AOP.Interceptors.Cache
 
             invocation.Proceed();
             var value = invocation.ReturnValue;
-            _cache.Set(cacheAttribute.Key, value, cacheAttribute.TTL);
+            _cache.Set(cacheKey, value, cacheAttribute.TTL);
         }
     }
 }

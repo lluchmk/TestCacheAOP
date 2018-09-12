@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Core.AOP
 {
-    // TODO: Separate into different files
-    public class InterceptorAssociation
-    {
-        public Type attributeType;
-        public Type interceptorType;
-    }
-
     public class InterceptorAssociationCollection : List<InterceptorAssociation>
     {
         public void AddEntry<TAttribute, TInterceptor>()

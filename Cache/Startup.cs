@@ -31,7 +31,7 @@ namespace TestCache
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCache("devappfab1.riadev.local:6379,devappfab2.riadev.local:6379,abortConnect=false");
+            services.AddRedis("devappfab1.riadev.local:6379,devappfab2.riadev.local:6379,abortConnect=false");
             services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
             services.AddTransientAOP<IValuesService, ValuesService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

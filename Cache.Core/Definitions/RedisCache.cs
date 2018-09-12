@@ -8,11 +8,11 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace Cache.Core.Definitions
 {
-    public class Cache : ICache
+    public class RedisCache : ICache
     {
         private IDatabase _database;
 
-        public Cache(IDatabase database)
+        public RedisCache(IDatabase database)
         {
             _database = database;
         }

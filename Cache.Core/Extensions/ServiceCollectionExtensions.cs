@@ -5,13 +5,15 @@ using System.Text;
 using StackExchange.Redis;
 
 using Cache.Core.Interfaces;
+using Cache.Core.Definitions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtesions
     {
-        private static IServiceCollection AddRedis(this IServiceCollection services, string connectionString) =>
-            services.AddSingleton(_provider => ConnectionMultiplexer.Connect(connectionString).GetDatabase());
+        public static IServiceCollection AddRedis(this IServiceCollection services, string connectionString) =>
+            services.AddSingleton<ICache>(_p =>  new RedisCache(ConnectionMultiplexer.Connect(connectionString).GetDatabase()));
+
         /*public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config, string configurationSection = "String") =>
             services.AddSingleton(_provider => {
                 
@@ -24,8 +26,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 return ConnectionMultiplexer.Connect(connectionOptions).GetDatabase();
             });*/
-
-        public static IServiceCollection AddCache(this IServiceCollection services, string connectionString) =>
-            services.AddRedis(connectionString).AddSingleton<ICache>(_p =>  new Cache.Core.Definitions.Cache(_p.GetService<IDatabase>()));
     }
 }

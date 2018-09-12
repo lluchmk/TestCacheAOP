@@ -32,19 +32,27 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
            where TService : class
            where TImplementation : class, TService
-        {
-            return services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
-        }
+            => services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
 
         public static IServiceCollection AddScopedAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
             => services.AddScoped<TService>(_p => GenerateProxy<TImplementation>(_p));
 
+        public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
+           where TService : class
+           where TImplementation : class, TService
+            => services.AddScoped<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
+
         public static IServiceCollection AddSingletonAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
             => services.AddSingleton<TService>(_p => GenerateProxy<TImplementation>(_p));
+
+        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
+           where TService : class
+           where TImplementation : class, TService
+            => services.AddSingleton<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
 
         private static T GenerateProxy<T>(IServiceProvider serviceProvider)
             where T : class

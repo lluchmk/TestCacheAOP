@@ -32,8 +32,8 @@ namespace TestCache
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRedis("devappfab1.riadev.local:6379,devappfab2.riadev.local:6379,abortConnect=false");
-            services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
-            services.AddTransientAOP<IValuesService, ValuesService>();
+            //services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
+            services.AddTransient<IValuesService, ValuesService>(typeof(CacheInterceptor));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

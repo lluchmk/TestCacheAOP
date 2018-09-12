@@ -29,6 +29,13 @@ namespace Microsoft.Extensions.DependencyInjection
            where TImplementation : class, TService
             => services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p));
 
+        public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
+           where TService : class
+           where TImplementation : class, TService
+        {
+            return services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
+        }
+
         public static IServiceCollection AddScopedAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
@@ -59,6 +66,28 @@ namespace Microsoft.Extensions.DependencyInjection
                     var interceptor = (IInterceptor)ctr.Invoke(ctrParams.ToArray());
                     interceptors.Add(interceptor);
                 }
+            }
+
+            var proxy = generator.CreateClassProxy<T>(interceptors.ToArray());
+            return proxy;
+        }
+
+        private static T GenerateProxy<T>(IServiceProvider serviceProvider, params Type[] interceptorTypes)
+            where T : class
+        {
+            var generator = new ProxyGenerator();
+
+            List<IInterceptor> interceptors = new List<IInterceptor>();
+            foreach (var entry in interceptorTypes)
+            {
+                var ctr = entry.GetConstructors()[0];
+                var ctrParams = new List<object>();
+                foreach (var p in ctr.GetParameters())
+                {
+                    ctrParams.Add(serviceProvider.GetService(p.ParameterType));
+                }
+                var interceptor = (IInterceptor)ctr.Invoke(ctrParams.ToArray());
+                interceptors.Add(interceptor);
             }
 
             var proxy = generator.CreateClassProxy<T>(interceptors.ToArray());

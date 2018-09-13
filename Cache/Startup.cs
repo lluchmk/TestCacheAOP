@@ -23,16 +23,15 @@ namespace TestCache
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _config = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration _config { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRedis("devappfab1.riadev.local:6379,devappfab2.riadev.local:6379,abortConnect=false");
-            //services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
+            services.AddRedis(_config["redisConnectionString"]);
             services.AddTransient<IValuesService, ValuesService>(typeof(CacheInterceptor));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }

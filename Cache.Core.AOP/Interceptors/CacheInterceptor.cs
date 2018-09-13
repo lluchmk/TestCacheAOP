@@ -38,7 +38,7 @@ namespace Cache.Core.AOP.Interceptors.Cache
                 cacheKey = cacheKey.Replace($"{{{paramName}}}", val.ToString());
             }
 
-            var cachedValue = _cache.Get(cacheKey, invocation.TargetType);
+            var cachedValue = _cache.Get(cacheKey, invocation.MethodInvocationTarget.ReturnType);
 
             if (cachedValue != null)
             {

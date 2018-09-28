@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 using Castle.DynamicProxy;
 
@@ -29,30 +30,16 @@ namespace Microsoft.Extensions.DependencyInjection
            where TImplementation : class, TService
             => services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p));
 
-        public static IServiceCollection AddTransient<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
-           where TService : class
-           where TImplementation : class, TService
-            => services.AddTransient<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
-
         public static IServiceCollection AddScopedAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
             => services.AddScoped<TService>(_p => GenerateProxy<TImplementation>(_p));
-
-        public static IServiceCollection AddScoped<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
-           where TService : class
-           where TImplementation : class, TService
-            => services.AddScoped<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
+        
 
         public static IServiceCollection AddSingletonAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
             => services.AddSingleton<TService>(_p => GenerateProxy<TImplementation>(_p));
-
-        public static IServiceCollection AddSingleton<TService, TImplementation>(this IServiceCollection services, params Type[] interceptorTypes)
-           where TService : class
-           where TImplementation : class, TService
-            => services.AddSingleton<TService>(_p => GenerateProxy<TImplementation>(_p, interceptorTypes));
 
         private static T GenerateProxy<T>(IServiceProvider serviceProvider)
             where T : class
@@ -63,43 +50,30 @@ namespace Microsoft.Extensions.DependencyInjection
             List<IInterceptor> interceptors = new List<IInterceptor>();
             foreach (var entry in interceptorsDef)
             {
-                if (typeof(T).GetCustomAttributes(entry.attributeType, false).Length > 0)
+                if (typeof(T).GetCustomAttributes(entry.attributeType, false).Any())
                 {
                     var ctr = entry.interceptorType.GetConstructors()[0];
-                    var ctrParams = new List<object>();
-                    foreach (var p in ctr.GetParameters())
-                    {
-                        ctrParams.Add(serviceProvider.GetService(p.ParameterType));
-                    }
-                    var interceptor = (IInterceptor)ctr.Invoke(ctrParams.ToArray());
+                    var interceptorParams = CtrParams(serviceProvider, entry.interceptorType);
+                    var interceptor = (IInterceptor)ctr.Invoke(interceptorParams);
                     interceptors.Add(interceptor);
                 }
             }
 
-            var proxy = generator.CreateClassProxy<T>(interceptors.ToArray());
+            var ctrParams = CtrParams(serviceProvider, typeof(T));
+            var proxy = (T)generator.CreateClassProxy(typeof(T), ctrParams, interceptors.ToArray());
             return proxy;
         }
 
-        private static T GenerateProxy<T>(IServiceProvider serviceProvider, params Type[] interceptorTypes)
-            where T : class
+        private static object[] CtrParams(IServiceProvider provider, Type t)
         {
-            var generator = new ProxyGenerator();
-
-            List<IInterceptor> interceptors = new List<IInterceptor>();
-            foreach (var entry in interceptorTypes)
+            var ctr = t.GetConstructors().Single();
+            var ctrParams = ctr.GetParameters();
+            var ret = new object[ctrParams.Count()];
+            for (int i = 0; i < ret.Length; i++)
             {
-                var ctr = entry.GetConstructors()[0];
-                var ctrParams = new List<object>();
-                foreach (var p in ctr.GetParameters())
-                {
-                    ctrParams.Add(serviceProvider.GetService(p.ParameterType));
-                }
-                var interceptor = (IInterceptor)ctr.Invoke(ctrParams.ToArray());
-                interceptors.Add(interceptor);
+                ret[i] = ActivatorUtilities.GetServiceOrCreateInstance(provider, ctrParams[i].ParameterType);
             }
-
-            var proxy = generator.CreateClassProxy<T>(interceptors.ToArray());
-            return proxy;
+            return ret;
         }
     }
 }

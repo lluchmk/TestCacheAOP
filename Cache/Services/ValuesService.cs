@@ -20,8 +20,16 @@ namespace Cache.Services
     {
         private IEnumerable<string> _values = new string[] { "value1", "value2" };
 
+        private readonly IInnerService _innerService;
+
+        public ValuesService(IInnerService innerService)
+        {
+            _innerService = innerService;
+        }
+
         public IEnumerable<string> GetValues()
         {
+            _innerService.Do(1);
             return _values;
         }
 

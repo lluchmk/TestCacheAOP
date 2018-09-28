@@ -32,7 +32,9 @@ namespace TestCache
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRedis(_config["redisConnectionString"]);
-            services.AddTransient<IValuesService, ValuesService>(typeof(CacheInterceptor));
+            services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
+            services.AddTransientAOP<IValuesService, ValuesService>();
+            services.AddTransientAOP<IInnerService, InnerService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

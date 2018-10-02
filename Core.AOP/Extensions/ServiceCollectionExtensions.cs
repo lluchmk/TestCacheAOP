@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Reflection;
 
 using Castle.DynamicProxy;
 
@@ -53,27 +54,27 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (typeof(T).GetCustomAttributes(entry.attributeType, false).Any())
                 {
                     var ctr = entry.interceptorType.GetConstructors()[0];
-                    var interceptorParams = CtrParams(serviceProvider, entry.interceptorType);
+                    var interceptorParams = ResolveConstructorParams(serviceProvider, entry.interceptorType, ctr);
                     var interceptor = (IInterceptor)ctr.Invoke(interceptorParams);
                     interceptors.Add(interceptor);
                 }
             }
 
-            var ctrParams = CtrParams(serviceProvider, typeof(T));
+            var ctrParams = ResolveConstructorParams(serviceProvider, typeof(T));
             var proxy = (T)generator.CreateClassProxy(typeof(T), ctrParams, interceptors.ToArray());
             return proxy;
         }
 
-        private static object[] CtrParams(IServiceProvider provider, Type t)
+        private static object[] ResolveConstructorParams(IServiceProvider provider, Type t, ConstructorInfo ctr = null)
         {
-            var ctr = t.GetConstructors().Single();
+            ctr = ctr ?? t.GetConstructors().Single();
             var ctrParams = ctr.GetParameters();
-            var ret = new object[ctrParams.Count()];
-            for (int i = 0; i < ret.Length; i++)
+            var resolvedParams = new object[ctrParams.Count()];
+            for (int i = 0; i < resolvedParams.Length; i++)
             {
-                ret[i] = ActivatorUtilities.GetServiceOrCreateInstance(provider, ctrParams[i].ParameterType);
+                resolvedParams[i] = ActivatorUtilities.GetServiceOrCreateInstance(provider, ctrParams[i].ParameterType);
             }
-            return ret;
+            return resolvedParams;
         }
     }
 }

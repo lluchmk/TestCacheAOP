@@ -29,39 +29,51 @@ namespace Cache.Core.Definitions
             return await _database.KeyExistsAsync(key);
         }
 
-        public T Get<T>(string key)
+        public T Get<T>(string key, TimeSpan? slidingExpiration = null)
         {
             var strValue = _database.StringGet(key);
 
             if (!strValue.IsNull)
             {
                 var deserializedValue = DeserializeObject<T>(strValue);
+                if (slidingExpiration.HasValue)
+                {
+                    _database.KeyExpire(key, slidingExpiration.Value);
+                }
                 return deserializedValue;
             }
 
             return default(T);
         }
 
-        public async Task<T> GetAsync<T>(string key)
+        public async Task<T> GetAsync<T>(string key, TimeSpan? slidingExpiration = null)
         {
             var strValue = await _database.StringGetAsync(key);
 
             if (!strValue.IsNull)
             {
                 var deserializedValue = DeserializeObject<T>(strValue);
+                if (slidingExpiration.HasValue)
+                {
+                    await _database.KeyExpireAsync(key, slidingExpiration.Value);
+                }
                 return deserializedValue;
             }
 
             return default(T);
         }
 
-        public object Get(string key, Type type)
+        public object Get(string key, Type type, TimeSpan? slidingExpiration = null)
         {
             var strValue = _database.StringGet(key);
 
             if (!strValue.IsNull)
             {
                 var deserializedValue = DeserializeObject(strValue, type);
+                if (slidingExpiration.HasValue)
+                {
+                    _database.KeyExpire(key, slidingExpiration.Value);
+                }
                 return deserializedValue;
             }
 
@@ -73,13 +85,17 @@ namespace Cache.Core.Definitions
             return null;
         }
 
-        public async Task<object> GetAsync(string key, Type type)
+        public async Task<object> GetAsync(string key, Type type, TimeSpan? slidingExpiration = null)
         {
             var strValue = await _database.StringGetAsync(key);
 
             if (!strValue.IsNull)
             {
                 var deserializedValue = DeserializeObject(strValue, type);
+                if (slidingExpiration.HasValue)
+                {
+                    await _database.KeyExpireAsync(key, slidingExpiration.Value);
+                }
                 return deserializedValue;
             }
 

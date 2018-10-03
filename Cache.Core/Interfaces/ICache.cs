@@ -7,6 +7,8 @@ namespace Cache.Core.Interfaces
     {
         dynamic GetUnderlyingDatabase();
 
+        Type GetUnderlyingDatabaseType();
+
         bool Exists(string key);
 
         Task<bool> ExistsAsync(string key);

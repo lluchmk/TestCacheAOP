@@ -15,10 +15,10 @@ namespace Cache.Core.Definitions
             _database = database;
         }
 
-        public dynamic GetUnderlyingDatabase()
-        {
-            return _database;
-        }
+        public dynamic GetUnderlyingDatabase() => _database;
+
+        public Type GetUnderlyingDatabaseType() => typeof(IDatabase);
+
         public bool Exists(string key)
         {
             return _database.KeyExists(key);

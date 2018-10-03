@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Cache.Core.AOP.Attributes;
-using Cache.Core.AOP.Interceptors;
+﻿using Cache.Core.AOP.Attributes;
 
 namespace Cache.Services
 {

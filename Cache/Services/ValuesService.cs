@@ -1,10 +1,5 @@
-﻿using System;
+﻿using Cache.Core.AOP.Attributes;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Cache.Core.AOP.Attributes;
-using Cache.Core.AOP.Interceptors;
 
 namespace Cache.Services
 {
@@ -18,7 +13,7 @@ namespace Cache.Services
     [Cacheable]
     public class ValuesService : IValuesService
     {
-        private IEnumerable<string> _values = new string[] { "value1", "value2" };
+        private readonly IEnumerable<string> _values = new string[] { "value1", "value2" };
 
         private readonly IInnerService _innerService;
 

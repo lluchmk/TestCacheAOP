@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Castle.DynamicProxy;
+using Core.AOP.Atributes;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-
-using Castle.DynamicProxy;
-
-using Core.AOP;
-using Core.AOP.Atributes;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
            where TService : class
            where TImplementation : class, TService
             => services.AddScoped<TService>(_p => GenerateProxy<TImplementation>(_p));
-        
+
 
         public static IServiceCollection AddSingletonAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class

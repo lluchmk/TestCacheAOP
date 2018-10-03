@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Cache.Core.Interfaces;
+﻿using Cache.Core.Interfaces;
 using StackExchange.Redis;
+using System;
+using System.Threading.Tasks;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace Cache.Core.Definitions
@@ -55,8 +53,8 @@ namespace Cache.Core.Definitions
             }
 
             return default(T);
-        }    
-        
+        }
+
         public object Get(string key, Type type)
         {
             var strValue = _database.StringGet(key);
@@ -68,7 +66,9 @@ namespace Cache.Core.Definitions
             }
 
             if (type.IsValueType)
+            {
                 return Activator.CreateInstance(type);
+            }
 
             return null;
         }
@@ -84,7 +84,9 @@ namespace Cache.Core.Definitions
             }
 
             if (type.IsValueType)
+            {
                 return Activator.CreateInstance(type);
+            }
 
             return null;
         }

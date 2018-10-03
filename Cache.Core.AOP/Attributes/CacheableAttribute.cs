@@ -1,6 +1,6 @@
-﻿using System;
-using Cache.Core.AOP.Interceptors;
+﻿using Cache.Core.AOP.Interceptors;
 using Core.AOP.Atributes;
+using System;
 
 namespace Cache.Core.AOP.Attributes
 {

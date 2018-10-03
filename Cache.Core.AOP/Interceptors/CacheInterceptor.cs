@@ -1,9 +1,7 @@
-﻿using System.Reflection;
-
-using Castle.DynamicProxy;
-
+﻿using Cache.Core.AOP.Attributes;
 using Cache.Core.Interfaces;
-using Cache.Core.AOP.Attributes;
+using Castle.DynamicProxy;
+using System.Reflection;
 
 namespace Cache.Core.AOP.Interceptors
 {

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Castle.DynamicProxy;
-
+﻿using Cache.Core.AOP.Interceptors;
 using Cache.Core.Interfaces;
-using Cache.Core.AOP.Interceptors;
+using Castle.DynamicProxy;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -15,7 +10,8 @@ namespace Microsoft.Extensions.DependencyInjection
             where TService : class
             where TImplementation : class, TService
         {
-            services.AddTransient<TService, TImplementation>(provider => {
+            services.AddTransient<TService, TImplementation>(provider =>
+            {
                 var generator = new ProxyGenerator();
                 var proxy = generator.CreateClassProxy<TImplementation>(new CacheInterceptor(provider.GetService<ICache>()));
                 return proxy;

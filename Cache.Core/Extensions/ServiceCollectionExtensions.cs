@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using StackExchange.Redis;
-
+﻿using Cache.Core.Definitions;
 using Cache.Core.Interfaces;
-using Cache.Core.Definitions;
+using StackExchange.Redis;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtesions
     {
         public static IServiceCollection AddRedis(this IServiceCollection services, string connectionString) =>
-            services.AddSingleton<ICache>(_p =>  new RedisCache(ConnectionMultiplexer.Connect(connectionString).GetDatabase()));
+            services.AddSingleton<ICache>(_p => new RedisCache(ConnectionMultiplexer.Connect(connectionString).GetDatabase()));
 
         /*public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config, string configurationSection = "String") =>
             services.AddSingleton(_provider => {

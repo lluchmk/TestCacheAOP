@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Cache.Services;
-using Cache.Core.AOP.Interceptors.Cache;
+using Cache.Core.AOP.Interceptors;
 using Cache.Core.AOP.Attributes;
 
 using Core.AOP;
@@ -32,7 +32,6 @@ namespace TestCache
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRedis(_config["redisConnectionString"]);
-            services.AddInterceptor<CacheableAttribute, CacheInterceptor>();
             services.AddTransientAOP<IValuesService, ValuesService>();
             services.AddTransientAOP<IInnerService, InnerService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

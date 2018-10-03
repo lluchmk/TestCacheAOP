@@ -7,25 +7,12 @@ using System.Reflection;
 using Castle.DynamicProxy;
 
 using Core.AOP;
+using Core.AOP.Atributes;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddInterceptor<TAttribute, TInterceptor>(this IServiceCollection services)
-            where TAttribute : class
-            where TInterceptor : class, IInterceptor
-        {
-            var interceptorsDictionary = services.BuildServiceProvider().GetService<InterceptorAssociationCollection>();
-            if (interceptorsDictionary == null)
-            {
-                interceptorsDictionary = new InterceptorAssociationCollection();
-                services.AddSingleton(interceptorsDictionary);
-            }
-            interceptorsDictionary.AddEntry<TAttribute, TInterceptor>();
-            return services;
-        }
-
         public static IServiceCollection AddTransientAOP<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
@@ -46,26 +33,23 @@ namespace Microsoft.Extensions.DependencyInjection
             where T : class
         {
             var generator = new ProxyGenerator();
-            var interceptorsDef = serviceProvider.GetService<InterceptorAssociationCollection>();
 
             List<IInterceptor> interceptors = new List<IInterceptor>();
-            foreach (var entry in interceptorsDef)
+            var interceptorTypes = typeof(T).GetCustomAttributes<InterceptableAttribute>().Select(attr => attr.InterceptorType);
+            foreach (var interceptorType in interceptorTypes)
             {
-                if (typeof(T).GetCustomAttributes(entry.attributeType, false).Any())
-                {
-                    var ctr = entry.interceptorType.GetConstructors()[0];
-                    var interceptorParams = ResolveConstructorParams(serviceProvider, entry.interceptorType, ctr);
-                    var interceptor = (IInterceptor)ctr.Invoke(interceptorParams);
-                    interceptors.Add(interceptor);
-                }
+                var ctr = interceptorType.GetConstructors()[0];
+                var interceptorParams = ResolveConstructorParameters(serviceProvider, interceptorType, ctr);
+                var interceptor = (IInterceptor)ctr.Invoke(interceptorParams);
+                interceptors.Add(interceptor);
             }
 
-            var ctrParams = ResolveConstructorParams(serviceProvider, typeof(T));
+            var ctrParams = ResolveConstructorParameters(serviceProvider, typeof(T));
             var proxy = (T)generator.CreateClassProxy(typeof(T), ctrParams, interceptors.ToArray());
             return proxy;
         }
 
-        private static object[] ResolveConstructorParams(IServiceProvider provider, Type t, ConstructorInfo ctr = null)
+        private static object[] ResolveConstructorParameters(IServiceProvider provider, Type t, ConstructorInfo ctr = null)
         {
             ctr = ctr ?? t.GetConstructors().Single();
             var ctrParams = ctr.GetParameters();

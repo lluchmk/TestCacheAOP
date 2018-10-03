@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cache.Core\Cache.Core.csproj" />
+    <ProjectReference Include="..\Core.AOP\Core.AOP.csproj" />
   </ItemGroup>
 
 </Project>

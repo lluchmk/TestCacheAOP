@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
+﻿using System.Reflection;
 
 using Castle.DynamicProxy;
 
 using Cache.Core.Interfaces;
 using Cache.Core.AOP.Attributes;
 
-namespace Cache.Core.AOP.Interceptors.Cache
+namespace Cache.Core.AOP.Interceptors
 {
     public class CacheInterceptor : IInterceptor
     {

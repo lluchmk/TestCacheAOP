@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Cache.Core.AOP.Attributes;
-using Cache.Core.AOP.Interceptors.Cache;
+using Cache.Core.AOP.Interceptors;
 
 namespace Cache.Services
 {

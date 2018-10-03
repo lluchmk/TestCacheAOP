@@ -5,7 +5,7 @@ using System.Text;
 using Castle.DynamicProxy;
 
 using Cache.Core.Interfaces;
-using Cache.Core.AOP.Interceptors.Cache;
+using Cache.Core.AOP.Interceptors;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

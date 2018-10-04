@@ -29,30 +29,21 @@ namespace Cache.Core.AOP.Interceptors
             }
 
             var methodParameters = invocation.MethodInvocationTarget.GetParameters();
-            try
+            var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, methodParameters, invocation.Arguments);
+            if (_cache.Exists(cacheKey))
             {
-                var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, methodParameters, invocation.Arguments);
-                if (_cache.Exists(cacheKey))
-                {
-                    var cachedValue = _cache.Get(
-                        cacheKey,
-                        invocation.MethodInvocationTarget.ReturnType,
-                        cacheAttribute.IsSlidingExpiration ? (TimeSpan?)cacheAttribute.TTL : null);
+                var cachedValue = _cache.Get(
+                    cacheKey,
+                    invocation.MethodInvocationTarget.ReturnType,
+                    cacheAttribute.IsSlidingExpiration ? (TimeSpan?)cacheAttribute.TTL : null);
 
-                    invocation.ReturnValue = cachedValue;
-                    return;
-                }
-
-                invocation.Proceed();
-                var value = invocation.ReturnValue;
-                _cache.Set(cacheKey, value, cacheAttribute.TTL);
-            }
-            catch (InvalidCacheKeyException)
-            {
-                // TODO: Log error
-                invocation.Proceed();
+                invocation.ReturnValue = cachedValue;
                 return;
             }
+
+            invocation.Proceed();
+            var value = invocation.ReturnValue;
+            _cache.Set(cacheKey, value, cacheAttribute.TTL);
         }
 
         private string ReplaceCacheKeyParameters(string cacheKey, ParameterInfo[] invocationParameters, object[] invocationArguments)

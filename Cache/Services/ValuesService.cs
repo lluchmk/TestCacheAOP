@@ -24,7 +24,7 @@ namespace Cache.Services
 
         public IEnumerable<string> GetValues()
         {
-            _innerService.Do(1);
+            var innerResult = _innerService.Do(new SimpleClass { Id = 1, Inner = new SimpleInnerClass { Id = 10 } }, 15);
             return _values;
         }
 

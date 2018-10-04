@@ -1,6 +1,7 @@
 ﻿using Cache.Core.AOP.Attributes;
 using Cache.Core.Interfaces;
 using Castle.DynamicProxy;
+using System;
 using System.Reflection;
 
 namespace Cache.Core.AOP.Interceptors
@@ -33,10 +34,13 @@ namespace Cache.Core.AOP.Interceptors
                 cacheKey = cacheKey.Replace($"{{{paramName}}}", val.ToString());
             }
 
-            var cachedValue = _cache.Get(cacheKey, invocation.MethodInvocationTarget.ReturnType);
-
-            if (cachedValue != null)
+            if (_cache.Exists(cacheKey))
             {
+                var cachedValue = _cache.Get(
+                    cacheKey,
+                    invocation.MethodInvocationTarget.ReturnType,
+                    cacheAttribute.IsSlidingExpiration ? (TimeSpan?)cacheAttribute.TTL : null);
+
                 invocation.ReturnValue = cachedValue;
                 return;
             }

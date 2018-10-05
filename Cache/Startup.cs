@@ -20,8 +20,8 @@ namespace TestCache
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRedis(_config["redisConnectionString"]);
-            services.AddTransientAOP<IValuesService, ValuesService>();
-            services.AddTransientAOP<IInnerService, InnerService>();
+            services.AddTransientWithInterceptors<IValuesService, ValuesService>();
+            services.AddTransientWithInterceptors<IInnerService, InnerService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

@@ -32,10 +32,12 @@ namespace Cache.Core.AOP.Interceptors
             var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, methodParameters, invocation.Arguments);
             if (_cache.Exists(cacheKey))
             {
-                var cachedValue = _cache.Get(
-                    cacheKey,
-                    invocation.MethodInvocationTarget.ReturnType,
-                    cacheAttribute.IsSlidingExpiration ? (TimeSpan?)cacheAttribute.TTL : null);
+                var cachedValue = _cache.Get(cacheKey, invocation.MethodInvocationTarget.ReturnType);
+
+                if (cacheAttribute.IsSlidingExpiration)
+                {
+                    _cache.SetExpirationTime(cacheKey, cacheAttribute.TTL);
+                }
 
                 invocation.ReturnValue = cachedValue;
                 return;

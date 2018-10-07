@@ -9,11 +9,17 @@ namespace Cache.Core.AOP.Attributes
         public readonly TimeSpan TTL;
         public readonly bool IsSlidingExpiration;
 
-        public CacheAttribute(string Key, string TTL, bool IsSlidingExpiration = false)
+        public CacheAttribute(string Key, string TTL)
         {
             this.Key = Key;
             this.TTL = TimeSpan.Parse(TTL);
-            this.IsSlidingExpiration = IsSlidingExpiration;
+            IsSlidingExpiration = false;
+        }
+
+        protected CacheAttribute(string Key, string TTL, bool IsSlidingExpiration)
+            : this(Key, TTL)
+        {
+            IsSlidingExpiration = IsSlidingExpiration;
         }
     }
 }

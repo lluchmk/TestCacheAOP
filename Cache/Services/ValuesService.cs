@@ -28,7 +28,7 @@ namespace Cache.Services
             return _values;
         }
 
-        [Cache("value_id:{id}", "00:00:30", true)]
+        [CacheWithSlidingExpiration("value_id:{id}", "00:00:30")]
         public virtual string Get(int id)
         {
             return $"value{id}";

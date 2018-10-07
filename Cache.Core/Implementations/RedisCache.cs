@@ -29,82 +29,24 @@ namespace Cache.Core.Definitions
             return await _database.KeyExistsAsync(key);
         }
 
-        public T Get<T>(string key, TimeSpan? slidingExpiration = null)
+        public T Get<T>(string key)
         {
-            var strValue = _database.StringGet(key);
-
-            if (!strValue.IsNull)
-            {
-                var deserializedValue = DeserializeObject<T>(strValue);
-                if (slidingExpiration.HasValue)
-                {
-                    _database.KeyExpire(key, slidingExpiration.Value);
-                }
-                return deserializedValue;
-            }
-
-            return default(T);
+            return _database.GetDeserialized<T>(key);
         }
 
-        public async Task<T> GetAsync<T>(string key, TimeSpan? slidingExpiration = null)
+        public async Task<T> GetAsync<T>(string key)
         {
-            var strValue = await _database.StringGetAsync(key);
-
-            if (!strValue.IsNull)
-            {
-                var deserializedValue = DeserializeObject<T>(strValue);
-                if (slidingExpiration.HasValue)
-                {
-                    await _database.KeyExpireAsync(key, slidingExpiration.Value);
-                }
-                return deserializedValue;
-            }
-
-            return default(T);
+            return await _database.GetDeserializedAsync<T>(key);
         }
 
-        public object Get(string key, Type type, TimeSpan? slidingExpiration = null)
+        public object Get(string key, Type type)
         {
-            var strValue = _database.StringGet(key);
-
-            if (!strValue.IsNull)
-            {
-                var deserializedValue = DeserializeObject(strValue, type);
-                if (slidingExpiration.HasValue)
-                {
-                    _database.KeyExpire(key, slidingExpiration.Value);
-                }
-                return deserializedValue;
-            }
-
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-
-            return null;
+            return _database.GetDeserialized(key, type);
         }
 
-        public async Task<object> GetAsync(string key, Type type, TimeSpan? slidingExpiration = null)
+        public async Task<object> GetAsync(string key, Type type)
         {
-            var strValue = await _database.StringGetAsync(key);
-
-            if (!strValue.IsNull)
-            {
-                var deserializedValue = DeserializeObject(strValue, type);
-                if (slidingExpiration.HasValue)
-                {
-                    await _database.KeyExpireAsync(key, slidingExpiration.Value);
-                }
-                return deserializedValue;
-            }
-
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
-
-            return null;
+            return await _database.GetDeserializedAsync(key, type);
         }
 
         public void Set<T>(string key, T value, TimeSpan ttl)
@@ -127,6 +69,16 @@ namespace Cache.Core.Definitions
         public async Task RemoveAsync(string key)
         {
             await _database.KeyDeleteAsync(key);
+        }
+
+        public void SetExpirationTime(string key, TimeSpan ttl)
+        {
+            _database.KeyExpire(key, ttl);
+        }
+
+        public async Task SetExpirationTimeAsync(string key, TimeSpan ttl)
+        {
+            await _database.KeyExpireAsync(key, ttl);
         }
     }
 }

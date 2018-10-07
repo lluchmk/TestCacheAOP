@@ -1,4 +1,4 @@
-﻿using Core.AOP.ProxyGeneration;
+﻿using static Core.AOP.ProxyGeneration.ProxyResolver;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -7,16 +7,16 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddTransientWithInterceptors<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
-            => services.AddTransient<TService>(_p => ProxyResolver.GenerateProxy<TImplementation>(_p));
+            => services.AddTransient<TService>(_p => ResolveProxy<TImplementation>(_p));
 
         public static IServiceCollection AddScopedWithInterceptors<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
-            => services.AddScoped<TService>(_p => ProxyResolver.GenerateProxy<TImplementation>(_p));
+            => services.AddScoped<TService>(_p => ResolveProxy<TImplementation>(_p));
 
         public static IServiceCollection AddSingletonWithInterceptors<TService, TImplementation>(this IServiceCollection services)
            where TService : class
            where TImplementation : class, TService
-            => services.AddSingleton<TService>(_p => ProxyResolver.GenerateProxy<TImplementation>(_p));
+            => services.AddSingleton<TService>(_p => ResolveProxy<TImplementation>(_p));
     }
 }

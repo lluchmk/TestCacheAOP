@@ -19,7 +19,7 @@ namespace Cache.Core.AOP.Attributes
         protected CacheAttribute(string Key, string TTL, bool IsSlidingExpiration)
             : this(Key, TTL)
         {
-            IsSlidingExpiration = IsSlidingExpiration;
+            this.IsSlidingExpiration = IsSlidingExpiration;
         }
     }
 }

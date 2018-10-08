@@ -14,7 +14,7 @@ namespace Cache.Services
         [Cache("value_outId:{obj.Id}_inId:{obj.Inner.Id}_id:{id}", "00:00:30")]
         public virtual string Do(SimpleClass obj, int id)
         {
-            return $"Inner service for outId={obj.Id}, inId={obj.Inner.Id}, id=id";
+            return $"Inner service for outId={obj.Id}, inId={obj.Inner.Id}, id={id}";
         }
     }
 

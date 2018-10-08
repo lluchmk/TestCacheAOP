@@ -22,7 +22,7 @@ namespace Cache.Core.AOP.Interceptors
         {
             var cacheAttribute = invocation.MethodInvocationTarget.GetCustomAttribute<CacheAttribute>();
 
-            if (cacheAttribute == null)
+            if (cacheAttribute is null)
             {
                 invocation.Proceed();
                 return;
@@ -32,20 +32,12 @@ namespace Cache.Core.AOP.Interceptors
             var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, methodParameters, invocation.Arguments);
             if (_cache.Exists(cacheKey))
             {
-                var cachedValue = _cache.Get(cacheKey, invocation.MethodInvocationTarget.ReturnType);
-
-                if (cacheAttribute.IsSlidingExpiration)
-                {
-                    _cache.SetExpirationTime(cacheKey, cacheAttribute.TTL);
-                }
-
+                var cachedValue =  GetFromCacheAndRefreshExpiration(cacheKey, invocation.MethodInvocationTarget.ReturnType, cacheAttribute);
                 invocation.ReturnValue = cachedValue;
                 return;
             }
 
-            invocation.Proceed();
-            var value = invocation.ReturnValue;
-            _cache.Set(cacheKey, value, cacheAttribute.TTL);
+            ProceedAndCache(ref invocation, cacheKey, cacheAttribute.TTL);
         }
 
         private string ReplaceCacheKeyParameters(string cacheKey, ParameterInfo[] invocationParameters, object[] invocationArguments)
@@ -57,31 +49,50 @@ namespace Cache.Core.AOP.Interceptors
 
             foreach (Match match in matches)
             {
-                var stringToReplace = match.Groups[0].Value;
-                var propertyName = match.Groups[1].Value;
-
-                if (propertyName.Contains('.'))
-                {
-                    var navigationParts = new Span<string>(propertyName.Split('.'));
-                    var firstPart = navigationParts[0];
-
-                    var parameterIndex = invocationParameters.SingleOrDefault(p => p.Name == firstPart)?.Position ??
-                        throw new InvalidCacheKeyException($"Invalid parameter name: {firstPart}");
-
-                    var parameterValue = GetInnerPropertyValue(navigationParts.Slice(1), invocationArguments[parameterIndex]);
-                    replacedCacheKey = replacedCacheKey.Replace(stringToReplace, parameterValue);
-                }
-                else
-                {
-                    var parameterIndex = invocationParameters.SingleOrDefault(p => p.Name == propertyName)?.Position ??
-                        throw new InvalidCacheKeyException($"Invalid parameter name: {propertyName}");
-
-                    var parameterValue = invocationArguments[parameterIndex];
-                    replacedCacheKey = replacedCacheKey.Replace(stringToReplace, parameterValue.ToString());
-                }
+                replacedCacheKey = ReplaceMatch(invocationParameters, invocationArguments, replacedCacheKey, match);
             }
 
             return replacedCacheKey;
+        }
+
+        private string ReplaceMatch(ParameterInfo[] invocationParameters, object[] invocationArguments, string replacedCacheKey, Match match)
+        {
+            var stringToReplace = match.Groups[0].Value;
+            var propertyName = match.Groups[1].Value;
+
+            replacedCacheKey = IsNavigationProperty(propertyName) ?
+                ReplaceNavigationProperty(invocationParameters, invocationArguments, replacedCacheKey, stringToReplace, propertyName) :
+                ReplaceProperty(invocationParameters, invocationArguments, replacedCacheKey, stringToReplace, propertyName);
+
+            return replacedCacheKey;
+        }
+
+        private static string ReplaceProperty(ParameterInfo[] invocationParameters, object[] invocationArguments, string replacedCacheKey, string stringToReplace, string propertyName)
+        {
+            var parameterIndex = invocationParameters.SingleOrDefault(p => p.Name == propertyName)?.Position ??
+                                throw new InvalidCacheKeyException($"Invalid parameter name: {propertyName}");
+
+            var parameterValue = invocationArguments[parameterIndex];
+            replacedCacheKey = replacedCacheKey.Replace(stringToReplace, parameterValue.ToString());
+            return replacedCacheKey;
+        }
+
+        private string ReplaceNavigationProperty(ParameterInfo[] invocationParameters, object[] invocationArguments, string replacedCacheKey, string stringToReplace, string propertyName)
+        {
+            var navigationParts = new Span<string>(propertyName.Split('.'));
+            var firstPart = navigationParts[0];
+
+            var parameterIndex = invocationParameters.SingleOrDefault(p => p.Name == firstPart)?.Position ??
+                throw new InvalidCacheKeyException($"Invalid parameter name: {firstPart}");
+
+            var parameterValue = GetInnerPropertyValue(navigationParts.Slice(1), invocationArguments[parameterIndex]);
+            replacedCacheKey = replacedCacheKey.Replace(stringToReplace, parameterValue);
+            return replacedCacheKey;
+        }
+
+        private bool IsNavigationProperty(string propertyName)
+        {
+            return propertyName.Contains('.');
         }
 
         private string GetInnerPropertyValue(Span<string> navigationParts, object obj)
@@ -92,6 +103,25 @@ namespace Cache.Core.AOP.Interceptors
             return navigationParts.Length > 1 ?
                 GetInnerPropertyValue(navigationParts.Slice(1), propertyValue) :
                 propertyValue.ToString();
+        }
+
+        private object GetFromCacheAndRefreshExpiration(string cacheKey, Type type, CacheAttribute cacheAttribute)
+        {
+            var cachedValue = _cache.Get(cacheKey, type);
+
+            if (cacheAttribute.IsSlidingExpiration)
+            {
+                _cache.SetExpirationTime(cacheKey, cacheAttribute.TTL);
+            }
+
+            return cachedValue;
+        }
+
+        private void ProceedAndCache(ref IInvocation invocation, string cacheKey, TimeSpan ttl)
+        {
+            invocation.Proceed();
+            var invocationResponse = invocation.ReturnValue;
+            _cache.Set(cacheKey, invocationResponse, ttl);
         }
     }
 }

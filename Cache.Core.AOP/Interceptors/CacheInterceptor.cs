@@ -28,8 +28,7 @@ namespace Cache.Core.AOP.Interceptors
                 return;
             }
 
-            var methodParameters = invocation.MethodInvocationTarget.GetParameters();
-            var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, methodParameters, invocation.Arguments);
+            var cacheKey = ReplaceCacheKeyParameters(cacheAttribute.Key, invocation);
             if (_cache.Exists(cacheKey))
             {
                 var cachedValue =  GetFromCacheAndRefreshExpiration(cacheKey, invocation.MethodInvocationTarget.ReturnType, cacheAttribute);
@@ -37,19 +36,21 @@ namespace Cache.Core.AOP.Interceptors
                 return;
             }
 
-            ProceedAndCache(ref invocation, cacheKey, cacheAttribute.TTL);
+            ProceedInvocationAndCache(ref invocation, cacheKey, cacheAttribute.TTL);
         }
 
-        private string ReplaceCacheKeyParameters(string cacheKey, ParameterInfo[] invocationParameters, object[] invocationArguments)
+        private string ReplaceCacheKeyParameters(string cacheKey, IInvocation invocation)
         {
             string replacedCacheKey = cacheKey;
+
+            var invocationParameters = invocation.MethodInvocationTarget.GetParameters();
 
             var cacheKeyToReplaceRegex = new Regex("{([^|]*?)}");
             var matches = cacheKeyToReplaceRegex.Matches(cacheKey);
 
             foreach (Match match in matches)
             {
-                replacedCacheKey = ReplaceMatch(invocationParameters, invocationArguments, replacedCacheKey, match);
+                replacedCacheKey = ReplaceMatch(invocationParameters, invocation.Arguments, replacedCacheKey, match);
             }
 
             return replacedCacheKey;
@@ -117,7 +118,7 @@ namespace Cache.Core.AOP.Interceptors
             return cachedValue;
         }
 
-        private void ProceedAndCache(ref IInvocation invocation, string cacheKey, TimeSpan ttl)
+        private void ProceedInvocationAndCache(ref IInvocation invocation, string cacheKey, TimeSpan ttl)
         {
             invocation.Proceed();
             var invocationResponse = invocation.ReturnValue;

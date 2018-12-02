@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="lluchmk.Cache.Core" Version="1.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cache.Core\Cache.Core.csproj" />
     <ProjectReference Include="..\Core.AOP\Core.AOP.csproj" />
   </ItemGroup>
 

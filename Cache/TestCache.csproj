@@ -9,12 +9,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="lluchmk.Cache.Core" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cache.Core.AOP\Cache.Core.AOP.csproj" />
-    <ProjectReference Include="..\Cache.Core\Cache.Core.csproj" />
     <ProjectReference Include="..\Core.AOP\Core.AOP.csproj" />
   </ItemGroup>
 

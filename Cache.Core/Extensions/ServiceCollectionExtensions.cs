@@ -1,5 +1,6 @@
 ﻿using Cache.Core.Definitions;
 using Cache.Core.Interfaces;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -9,17 +10,19 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddRedis(this IServiceCollection services, string connectionString) =>
             services.AddSingleton<ICache>(_p => new RedisCache(ConnectionMultiplexer.Connect(connectionString).GetDatabase()));
 
-        /*public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config, string configurationSection = "String") =>
-            services.AddSingleton(_provider => {
-                
-                // TODO: get configuration from config
-                var redisConfSection = config.GetSection(configurationSection);
-                var connectionOptions = new ConfigurationOptions();
-                foreach (var endPoint in redisConfSection.GetSection("EndPoints").Get<string[]>())
-                    connectionOptions.EndPoints.Add(endPoint);
-                connectionOptions.AbortOnConnectFail = redisConfSection["AbbortOnFail"] ?? connectionOptions.AbortOnConnectFail;
+        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config, string configurationSectionName = "Redis") =>
+            services.AddSingleton<ICache>(_provider =>
+            {
+                var configurationSection = config.GetSection(configurationSectionName);
+                var redisConfigurationOptions = configurationSection.Get<ConfigurationOptions>();
 
-                return ConnectionMultiplexer.Connect(connectionOptions).GetDatabase();
-            });*/
+                var endpointsSection = configurationSection.GetSection("EndPoints");
+                foreach (var endpoint in endpointsSection.Get<string[]>())
+                {
+                    redisConfigurationOptions.EndPoints.Add(endpoint);
+                }
+
+                return new RedisCache(ConnectionMultiplexer.Connect(redisConfigurationOptions).GetDatabase());
+            });
     }
 }
